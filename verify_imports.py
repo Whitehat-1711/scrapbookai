@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+"""
+Import verification script for the backend restructuring
+Run this to validate all imports are correct
+"""
+
+import sys
+sys.path.insert(0, '.')
+
+print("🔍 Verifying backend imports...")
+
+try:
+    print("  ✓ Importing core modules...")
+    from backend.core.config import APP_HOST, APP_PORT
+    from backend.core.database import get_blogs_collection
+    
+    print("  ✓ Importing models...")
+    from backend.models.models import BlogDocument
+    from backend.models.request_models import BlogGenerationRequest
+    from backend.models.response_models import BlogGenerationResponse
+    
+    print("  ✓ Importing services...")
+    from backend.services.groq_service import chat_completion
+    from backend.services.hashnode_service import publish_to_hashnode
+    from backend.services.ai_detection_service import analyze_ai_probability
+    
+    print("  ✓ Importing agents...")
+    from backend.agents.keyword_agent import run_keyword_clustering
+    from backend.agents.serp_agent import run_serp_analysis
+    from backend.agents.blog_generator import run_blog_generation
+    from backend.agents.seo_optimizer import run_seo_analysis
+    from backend.agents.snippet_agent import run_snippet_optimization
+    from backend.agents.humanizer import run_humanization
+    from backend.agents.internal_linking_agent import run_internal_linking
+    
+    print("  ✓ Importing routers...")
+    from backend.routers.blog import router as blog_router
+    from backend.routers.blog_management import router as blog_management_router
+    from backend.routers.keywords import router as keywords_router
+    from backend.routers.serp import router as serp_router
+    from backend.routers.seo import router as seo_router
+    
+    print("  ✓ Importing main app...")
+    from backend.core.main import app
+    
+    print("\n✅ All imports successful!")
+    print("\n✨ backend structure is valid and ready to run!")
+    print("\nTo start the server, run:")
+    print("  python -m uvicorn backend.core.main:app --reload --host 0.0.0.0 --port 8000")
+    
+except Exception as e:
+    print(f"\n❌ Import failed: {e}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)

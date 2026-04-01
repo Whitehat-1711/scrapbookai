@@ -1,0 +1,86 @@
+/* ============================================================
+   Blogy AI — Global Stylesheet
+   Single source of truth for shared layout.
+   Imported once in main.jsx so no page-level style tag
+   can accidentally override the shell layout.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600;700&display=swap');
+
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Nunito', sans-serif;
+  background: #F5EBDD;
+  color: #1F2A44;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { height: 100%; }
+
+/* ── App shell ─────────────────────────────────────────────── */
+/* ALL pages share this shell. The sidebar is fixed-height;
+   main-content gets its own scrollbar. */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #F5EBDD;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #F5EBDD;
+  /* subtle dot-grid fallback — individual pages may override */
+  background-image:
+    linear-gradient(rgba(31,42,68,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31,42,68,0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── Shared topbar ─────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: rgba(245,235,221,0.92);
+  backdrop-filter: blur(4px);
+  border-bottom: 1.5px dashed rgba(31,42,68,0.12);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.topbar-greeting { font-weight: 700; font-size: 14px; color: #1F2A44; }
+.topbar-avatar  { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #1F2A44; overflow: hidden; cursor: pointer; }
+.topbar-search  { flex: 1; max-width: 320px; display: flex; align-items: center; gap: 8px; background: #FDFAF6; border: 1.5px solid rgba(31,42,68,0.15); border-radius: 50px; padding: 8px 16px; }
+.topbar-search input { border: none; background: transparent; outline: none; font-family: 'Nunito', sans-serif; font-size: 13px; color: #1F2A44; width: 100%; }
+.topbar-search input::placeholder { color: #9AA5B4; }
+.bell-wrap { position: relative; cursor: pointer; font-size: 18px; }
+.bell-dot  { position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: #F4A4A4; border-radius: 50%; border: 1.5px solid #F5EBDD; }
+
+/* ── Shared badges ─────────────────────────────────────────── */
+.badge     { padding: 5px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: 1.5px solid; }
+.badge-geo { background: #C8E6CB; color: #2D6A4F; border-color: #2D6A4F; }
+.badge-seo { background: #FFF3CD; color: #92681A; border-color: #92681A; }
+
+/* ── Shared spinner ────────────────────────────────────────── */
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(31,42,68,0.1);
+  border-top-color: #FFC857;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Scrollbar (webkit) ────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(31,42,68,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(31,42,68,0.3); }
