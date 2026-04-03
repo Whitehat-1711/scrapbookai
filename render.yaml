@@ -2,7 +2,7 @@ services:
   # Frontend Service
   - type: static_site
     name: blogy-frontend
-    buildCommand: cd frontend && npm install && npm run build
+    buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
