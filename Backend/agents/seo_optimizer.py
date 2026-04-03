@@ -9,7 +9,7 @@ from __future__ import annotations
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.utils.seo_utils import (
+    from Backend.utils.seo_utils import (
         compute_keyword_density,
         keyword_in_first_n_words,
         keyword_in_title,
@@ -21,8 +21,8 @@ try:
         estimate_traffic_potential,
         count_words,
     )
-    from backend.models.response_models import KeywordDensityDetail, SEOScoreResponse
-    from backend.core.config import KEYWORD_DENSITY_MIN, KEYWORD_DENSITY_MAX
+    from Backend.models.response_models import KeywordDensityDetail, SEOScoreResponse
+    from Backend.core.config import KEYWORD_DENSITY_MIN, KEYWORD_DENSITY_MAX
 except ImportError:
     from ..utils.seo_utils import (
         compute_keyword_density,

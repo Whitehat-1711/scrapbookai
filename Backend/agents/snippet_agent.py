@@ -10,9 +10,9 @@ import re
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.services.groq_service import chat_completion_json
-    from backend.utils.prompts import snippet_optimization_prompts
-    from backend.models.response_models import SnippetVariant, SnippetOptimizationResponse
+    from Backend.services.groq_service import chat_completion_json
+    from Backend.utils.prompts import snippet_optimization_prompts
+    from Backend.models.response_models import SnippetVariant, SnippetOptimizationResponse
 except ImportError:
     from ..services.groq_service import chat_completion_json
     from ..utils.prompts import snippet_optimization_prompts

@@ -22,7 +22,7 @@ async def test_motor_import():
 async def test_database_import():
     """Test that database module imports correctly"""
     try:
-        from backend.core.database import connect_to_mongo, disconnect_from_mongo
+        from Backend.core.database import connect_to_mongo, disconnect_from_mongo
         print("✅ Database module imports successfully")
         return True
     except ImportError as e:
@@ -33,7 +33,7 @@ async def test_database_import():
 async def test_mongodb_connection():
     """Test MongoDB connection"""
     try:
-        from backend.core.database import connect_to_mongo, disconnect_from_mongo
+        from Backend.core.database import connect_to_mongo, disconnect_from_mongo
         print("\n🔌 Attempting MongoDB connection...")
         
         await connect_to_mongo()

@@ -17,7 +17,7 @@ from datetime import datetime
 from bson import ObjectId
 
 from ..core.database import get_blogs_collection
-from ..models.models import BlogResponse
+from ..models.models import BlogResponse, BlogListResponse
 from ..services.hashnode_service import publish_to_hashnode
 
 router = APIRouter(prefix="/blog", tags=["Blog Management"])
@@ -93,7 +93,7 @@ def _serialize_list_item(doc: dict) -> dict:
     return item
 
 
-@router.get("/list", response_model=List[BlogResponse])
+@router.get("/list", response_model=List[BlogListResponse])
 async def list_blogs(
     limit: int = Query(default=50, ge=1, le=200),
     skip: int = Query(default=0, ge=0),
@@ -127,7 +127,7 @@ async def list_blogs(
                 item["word_count"] = item.get("word_count") or 0
                 item["status"] = item.get("status") or "published"
 
-                results.append(BlogResponse(**item))
+                results.append(BlogListResponse(**item))
             except Exception as inner_error:
                 print("⚠️ Skipping invalid blog document:", inner_error)
                 continue
@@ -136,6 +136,96 @@ async def list_blogs(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to list blogs: {str(e)}")
+
+
+@router.get("/list/count")
+async def count_blogs(status: Optional[str] = Query(default=None)):
+    """Count total blogs in the database (optionally filtered by status)"""
+    try:
+        collection = get_blogs_collection()
+
+        if collection is None:
+            return {"count": 0}
+
+        query = {}
+        if status:
+            query["status"] = status
+
+        count = await collection.count_documents(query)
+        return {"count": count}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to count blogs: {str(e)}")
+
+
+@router.get("/{blog_id}", response_model=BlogResponse)
+async def get_blog(blog_id: str):
+    """Get a single blog by ID"""
+    if not _is_valid_oid(blog_id):
+        raise HTTPException(status_code=400, detail="Invalid blog ID format")
+
+    try:
+        collection = get_blogs_collection()
+
+        if collection is None:
+            raise HTTPException(status_code=503, detail="Database unavailable")
+
+        doc = await collection.find_one({"_id": ObjectId(blog_id)})
+
+        if not doc:
+            raise HTTPException(status_code=404, detail="Blog not found")
+
+        item = _serialize_list_item(doc)
+        item["seo_score"] = item.get("seo_score") or 0
+        item["word_count"] = item.get("word_count") or 0
+        item["status"] = item.get("status") or "published"
+
+        return BlogResponse(**item)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get blog: {str(e)}")
+
+
+@router.put("/{blog_id}/status")
+async def update_blog_status(blog_id: str, req: StatusUpdateRequest):
+    """Update blog status (published/draft/archived)"""
+    if not _is_valid_oid(blog_id):
+        raise HTTPException(status_code=400, detail="Invalid blog ID format")
+
+    valid_statuses = ["published", "draft", "archived"]
+    if req.status not in valid_statuses:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid status. Must be one of: {', '.join(valid_statuses)}"
+        )
+
+    try:
+        collection = get_blogs_collection()
+
+        if collection is None:
+            raise HTTPException(status_code=503, detail="Database unavailable")
+
+        result = await collection.update_one(
+            {"_id": ObjectId(blog_id)},
+            {
+                "$set": {
+                    "status": req.status,
+                    "updated_at": datetime.utcnow(),
+                }
+            },
+        )
+
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Blog not found")
+
+        return {"status": "updated", "blog_id": blog_id, "new_status": req.status}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update blog status: {str(e)}")
 
 
 @router.put("/{blog_id}/publish-hashnode")

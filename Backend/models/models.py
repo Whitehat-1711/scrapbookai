@@ -60,6 +60,19 @@ class BlogResponse(BaseModel):
     status: str = "published"
 
 
+class BlogListResponse(BaseModel):
+    """Lightweight response model for blog list endpoint (no content)"""
+    id: Optional[str] = None
+    keyword: str
+    title: str
+    seo_score: int
+    word_count: int
+    created_at: Optional[datetime] = None
+    status: str = "published"
+    meta_description: Optional[str] = None
+    slug: Optional[str] = None
+
+
 class UserDocument(BaseModel):
     """MongoDB User Document Schema (for future multi-user support)"""
     id: Optional[str] = Field(alias="_id", default=None)

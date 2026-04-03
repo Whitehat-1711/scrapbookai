@@ -1,8 +1,0 @@
-services:
-  - type: static_site
-    name: blogy-ui
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://blogy-api.onrender.com

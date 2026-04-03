@@ -10,10 +10,10 @@ from slugify import slugify
 
 # Handle imports with fallback for different module contexts
 try:
-    # When run as uvicorn backend.core.main:app
-    from backend.services.groq_service import chat_completion, chat_completion_json
-    from backend.utils.prompts import blog_generation_prompts, title_meta_prompts
-    from backend.models.response_models import SERPAnalysisResponse, KeywordClusterResponse
+    # When run as uvicorn Backend.core.main:app
+    from Backend.services.groq_service import chat_completion, chat_completion_json
+    from Backend.utils.prompts import blog_generation_prompts, title_meta_prompts
+    from Backend.models.response_models import SERPAnalysisResponse, KeywordClusterResponse
 except ImportError:
     # Fallback for relative imports
     from ..services.groq_service import chat_completion, chat_completion_json

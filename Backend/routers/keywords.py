@@ -7,10 +7,10 @@ from fastapi import APIRouter, HTTPException
 
 # Handle imports with fallback for different module contexts
 try:
-    # When run as: uvicorn backend.core.main:app
-    from backend.models.request_models import KeywordClusterRequest
-    from backend.models.response_models import KeywordClusterResponse
-    from backend.agents.keyword_agent import run_keyword_clustering
+    # When run as: uvicorn Backend.core.main:app
+    from Backend.models.request_models import KeywordClusterRequest
+    from Backend.models.response_models import KeywordClusterResponse
+    from Backend.agents.keyword_agent import run_keyword_clustering
 except ImportError:
     # Fallback for relative imports
     from ..models.request_models import KeywordClusterRequest

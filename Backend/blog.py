@@ -27,7 +27,7 @@ from ai_detection_service import analyze_ai_probability
 from config import GROQ_MODEL
 
 # ── Database ────────────────────────────────────────────────────────────────
-from backend.core.database import get_blogs_collection
+from Backend.core.database import get_blogs_collection
 from models import BlogDocument
 from datetime import datetime
 

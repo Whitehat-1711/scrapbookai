@@ -1,0 +1,30 @@
+services:
+  # Frontend Service
+  - type: static_site
+    name: blogy-frontend
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://blogy-api.onrender.com
+
+  # Backend Service
+  - type: web
+    name: blogy-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r Backend/requirements.txt
+    startCommand: python -m uvicorn Backend.core.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: GROQ_API_KEY
+        sync: false
+      - key: MONGODB_URL
+        sync: false
+      - key: MONGODB_DB_NAME
+        value: blogy
+      - key: APP_ENV
+        value: production
+      - key: CORS_ORIGINS
+        value: https://blogy.onrender.com,http://localhost:5173

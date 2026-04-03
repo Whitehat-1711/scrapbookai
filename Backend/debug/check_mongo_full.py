@@ -24,7 +24,7 @@ async def main():
         return 1
 
     try:
-        from backend.core.database import connect_to_mongo, disconnect_from_mongo, get_db, get_blogs_collection
+        from Backend.core.database import connect_to_mongo, disconnect_from_mongo, get_db, get_blogs_collection
         from config import MONGODB_URL, MONGODB_DB_NAME
         print("   ✅ database module imported")
         print(f"   📦 Database name: {MONGODB_DB_NAME}")

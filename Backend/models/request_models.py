@@ -57,3 +57,8 @@ class InternalLinkRequest(BaseModel):
         description="[{'title': str, 'url': str, 'topic': str, 'keywords': [str]}]"
     )
     primary_keyword: str
+
+
+class HumanizationRequest(BaseModel):
+    content: str = Field(..., min_length=100, description="Content to humanize")
+    force: bool = Field(default=False, description="Force humanization even if AI score is low")

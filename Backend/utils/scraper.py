@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.core.config import SCRAPER_TIMEOUT, MAX_SERP_RESULTS
+    from Backend.core.config import SCRAPER_TIMEOUT, MAX_SERP_RESULTS
 except ImportError:
     from ..core.config import SCRAPER_TIMEOUT, MAX_SERP_RESULTS
 

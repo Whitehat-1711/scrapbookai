@@ -10,7 +10,7 @@ from groq import AsyncGroq
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.core.config import GROQ_API_KEY, GROQ_MODEL, GROQ_MAX_TOKENS, GROQ_TEMPERATURE
+    from Backend.core.config import GROQ_API_KEY, GROQ_MODEL, GROQ_MAX_TOKENS, GROQ_TEMPERATURE
 except ImportError:
     from ..core.config import GROQ_API_KEY, GROQ_MODEL, GROQ_MAX_TOKENS, GROQ_TEMPERATURE
 

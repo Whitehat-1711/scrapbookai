@@ -13,7 +13,7 @@ import statistics
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.utils.seo_utils import strip_markdown, count_sentences
+    from Backend.utils.seo_utils import strip_markdown, count_sentences
 except ImportError:
     from ..utils.seo_utils import strip_markdown, count_sentences
 

@@ -10,7 +10,7 @@ from typing import Optional, Dict, Any
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.core.config import HASHNODE_API_TOKEN, HASHNODE_PUBLICATION_ID
+    from Backend.core.config import HASHNODE_API_TOKEN, HASHNODE_PUBLICATION_ID
 except ImportError:
     from ..core.config import HASHNODE_API_TOKEN, HASHNODE_PUBLICATION_ID
 

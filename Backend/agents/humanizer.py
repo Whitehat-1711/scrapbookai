@@ -7,10 +7,10 @@ Only runs if enable_humanization=True and ai_probability > 45%.
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.services.groq_service import chat_completion
-    from backend.services.ai_detection_service import analyze_ai_probability
-    from backend.utils.prompts import humanization_prompts
-    from backend.models.response_models import AIDetectionResponse
+    from Backend.services.groq_service import chat_completion
+    from Backend.services.ai_detection_service import analyze_ai_probability
+    from Backend.utils.prompts import humanization_prompts
+    from Backend.models.response_models import AIDetectionResponse
 except ImportError:
     from ..services.groq_service import chat_completion
     from ..services.ai_detection_service import analyze_ai_probability

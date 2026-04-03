@@ -15,11 +15,11 @@ from collections import Counter
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.utils.scraper import get_serp_results, fetch_multiple_pages
-    from backend.services.groq_service import chat_completion_json
-    from backend.utils.prompts import serp_gap_prompts
-    from backend.models.response_models import SERPResult, SERPGap, SERPAnalysisResponse
-    from backend.core.config import MAX_SERP_RESULTS
+    from Backend.utils.scraper import get_serp_results, fetch_multiple_pages
+    from Backend.services.groq_service import chat_completion_json
+    from Backend.utils.prompts import serp_gap_prompts
+    from Backend.models.response_models import SERPResult, SERPGap, SERPAnalysisResponse
+    from Backend.core.config import MAX_SERP_RESULTS
 except ImportError:
     from ..utils.scraper import get_serp_results, fetch_multiple_pages
     from ..services.groq_service import chat_completion_json

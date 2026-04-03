@@ -28,6 +28,7 @@ try:
     from Backend.routers.keywords import router as keywords_router
     from Backend.routers.serp import router as serp_router
     from Backend.routers.seo import router as seo_router
+    from Backend.routers.humanize import router as humanize_router
 except ImportError:
     # Fallback for other import contexts
     from ..routers.blog import router as blog_router
@@ -35,6 +36,7 @@ except ImportError:
     from ..routers.keywords import router as keywords_router
     from ..routers.serp import router as serp_router
     from ..routers.seo import router as seo_router
+    from ..routers.humanize import router as humanize_router
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -139,6 +141,7 @@ app.include_router(blog_management_router)
 app.include_router(keywords_router)
 app.include_router(serp_router)
 app.include_router(seo_router)
+app.include_router(humanize_router)
 
 
 # ── Root & Health ──────────────────────────────────────────────────────────────

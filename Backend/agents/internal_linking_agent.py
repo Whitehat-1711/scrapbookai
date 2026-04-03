@@ -7,9 +7,9 @@ contextually relevant internal links with optimal anchor texts.
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.services.groq_service import chat_completion_json
-    from backend.utils.prompts import internal_linking_prompts
-    from backend.models.response_models import InternalLinkSuggestion, InternalLinkResponse
+    from Backend.services.groq_service import chat_completion_json
+    from Backend.utils.prompts import internal_linking_prompts
+    from Backend.models.response_models import InternalLinkSuggestion, InternalLinkResponse
 except ImportError:
     from ..services.groq_service import chat_completion_json
     from ..utils.prompts import internal_linking_prompts

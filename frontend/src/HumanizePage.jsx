@@ -253,12 +253,12 @@ export default function HumanizePage({ activePage = "humanizer", onNavigate }) {
                   <div className="score-grid">
                     <div className="score-card">
                       <div className="score-label">Original probability</div>
-                      <div className="score-value">{formatPercent(humanizeResult.original_ai_probability)}</div>
+                      <div className="score-value">{formatPercent(humanizeResult.before_detection?.ai_probability_percent)}</div>
                       <div className="score-sub">AI likelihood before rewrite</div>
                     </div>
                     <div className="score-card">
                       <div className="score-label">Final probability</div>
-                      <div className="score-value">{formatPercent(humanizeResult.final_ai_probability)}</div>
+                      <div className="score-value">{formatPercent(humanizeResult.after_detection?.ai_probability_percent)}</div>
                       <div className="score-sub">After Humanizer pass</div>
                     </div>
                     <div className="score-card">
@@ -317,9 +317,9 @@ export default function HumanizePage({ activePage = "humanizer", onNavigate }) {
 
                   <div className="rewritten-card">
                     <div className="panel-label" style={{ marginBottom: 6 }}>Humanized draft</div>
-                    <textarea value={humanizeResult.content} readOnly />
+                    <textarea value={humanizeResult.humanized_content || ""} readOnly />
                     <div className="rewritten-actions">
-                      <button className="secondary-btn" type="button" onClick={() => copyToClipboard(humanizeResult.content)}>
+                      <button className="secondary-btn" type="button" onClick={() => copyToClipboard(humanizeResult.humanized_content)}>
                         {copied ? "Copied" : "Copy to clipboard"}
                       </button>
                       <button className="secondary-btn" type="button" onClick={() => onNavigate?.("blog-gen")}>Send to Blog Lab</button>

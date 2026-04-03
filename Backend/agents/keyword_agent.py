@@ -7,9 +7,9 @@ with estimated traffic and difficulty.
 
 # Handle imports with fallback for different module contexts
 try:
-    from backend.services.groq_service import chat_completion_json
-    from backend.utils.prompts import keyword_cluster_prompts
-    from backend.models.response_models import KeywordCluster, KeywordClusterResponse
+    from Backend.services.groq_service import chat_completion_json
+    from Backend.utils.prompts import keyword_cluster_prompts
+    from Backend.models.response_models import KeywordCluster, KeywordClusterResponse
 except ImportError:
     from ..services.groq_service import chat_completion_json
     from ..utils.prompts import keyword_cluster_prompts

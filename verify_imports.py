@@ -11,37 +11,37 @@ print("🔍 Verifying backend imports...")
 
 try:
     print("  ✓ Importing core modules...")
-    from backend.core.config import APP_HOST, APP_PORT
-    from backend.core.database import get_blogs_collection
+    from Backend.core.config import APP_HOST, APP_PORT
+    from Backend.core.database import get_blogs_collection
     
     print("  ✓ Importing models...")
-    from backend.models.models import BlogDocument
-    from backend.models.request_models import BlogGenerationRequest
-    from backend.models.response_models import BlogGenerationResponse
+    from Backend.models.models import BlogDocument
+    from Backend.models.request_models import BlogGenerationRequest
+    from Backend.models.response_models import BlogGenerationResponse
     
     print("  ✓ Importing services...")
-    from backend.services.groq_service import chat_completion
-    from backend.services.hashnode_service import publish_to_hashnode
-    from backend.services.ai_detection_service import analyze_ai_probability
+    from Backend.services.groq_service import chat_completion
+    from Backend.services.hashnode_service import publish_to_hashnode
+    from Backend.services.ai_detection_service import analyze_ai_probability
     
     print("  ✓ Importing agents...")
-    from backend.agents.keyword_agent import run_keyword_clustering
-    from backend.agents.serp_agent import run_serp_analysis
-    from backend.agents.blog_generator import run_blog_generation
-    from backend.agents.seo_optimizer import run_seo_analysis
-    from backend.agents.snippet_agent import run_snippet_optimization
-    from backend.agents.humanizer import run_humanization
-    from backend.agents.internal_linking_agent import run_internal_linking
+    from Backend.agents.keyword_agent import run_keyword_clustering
+    from Backend.agents.serp_agent import run_serp_analysis
+    from Backend.agents.blog_generator import run_blog_generation
+    from Backend.agents.seo_optimizer import run_seo_analysis
+    from Backend.agents.snippet_agent import run_snippet_optimization
+    from Backend.agents.humanizer import run_humanization
+    from Backend.agents.internal_linking_agent import run_internal_linking
     
     print("  ✓ Importing routers...")
-    from backend.routers.blog import router as blog_router
-    from backend.routers.blog_management import router as blog_management_router
-    from backend.routers.keywords import router as keywords_router
-    from backend.routers.serp import router as serp_router
-    from backend.routers.seo import router as seo_router
+    from Backend.routers.blog import router as blog_router
+    from Backend.routers.blog_management import router as blog_management_router
+    from Backend.routers.keywords import router as keywords_router
+    from Backend.routers.serp import router as serp_router
+    from Backend.routers.seo import router as seo_router
     
     print("  ✓ Importing main app...")
-    from backend.core.main import app
+    from Backend.core.main import app
     
     print("\n✅ All imports successful!")
     print("\n✨ backend structure is valid and ready to run!")

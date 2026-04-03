@@ -11,21 +11,21 @@ from bson import ObjectId
 
 # Handle imports with fallback for different module contexts
 try:
-    # When run as: uvicorn backend.core.main:app
-    from backend.models.request_models import BlogGenerationRequest
-    from backend.models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult
-    from backend.agents.keyword_agent import run_keyword_clustering
-    from backend.agents.serp_agent import run_serp_analysis
-    from backend.agents.blog_generator import run_blog_generation
-    from backend.agents.seo_optimizer import run_seo_analysis
-    from backend.agents.snippet_agent import run_snippet_optimization
-    from backend.agents.humanizer import run_humanization
-    from backend.agents.internal_linking_agent import run_internal_linking
-    from backend.services.ai_detection_service import analyze_ai_probability
-    from backend.core.config import GROQ_MODEL, HASHNODE_AUTO_PUBLISH
-    from backend.services.hashnode_service import publish_to_hashnode
-    from backend.core.database import get_blogs_collection
-    from backend.models.models import BlogDocument
+    # When run as: uvicorn Backend.core.main:app
+    from Backend.models.request_models import BlogGenerationRequest
+    from Backend.models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult
+    from Backend.agents.keyword_agent import run_keyword_clustering
+    from Backend.agents.serp_agent import run_serp_analysis
+    from Backend.agents.blog_generator import run_blog_generation
+    from Backend.agents.seo_optimizer import run_seo_analysis
+    from Backend.agents.snippet_agent import run_snippet_optimization
+    from Backend.agents.humanizer import run_humanization
+    from Backend.agents.internal_linking_agent import run_internal_linking
+    from Backend.services.ai_detection_service import analyze_ai_probability
+    from Backend.core.config import GROQ_MODEL, HASHNODE_AUTO_PUBLISH
+    from Backend.services.hashnode_service import publish_to_hashnode
+    from Backend.core.database import get_blogs_collection
+    from Backend.models.models import BlogDocument
 except ImportError:
     # Fallback for relative imports
     from ..models.request_models import BlogGenerationRequest
