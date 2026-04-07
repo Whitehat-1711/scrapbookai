@@ -93,10 +93,13 @@ async def run_blog_generation(
     internal_links: list[dict],
     title_override: str | None,
     competitor_urls: list[str] = [],
+    web_search_data: dict | None = None,
 ) -> dict:
     """
     Generates the blog post and returns a dict with:
     { title, meta_description, slug, content }
+    
+    web_search_data: Optional web search results with latest information
     """
     # Extract SERP intelligence
     content_gaps: list[str] = []
@@ -105,6 +108,7 @@ async def run_blog_generation(
     missing_keywords: list[str] = []
     weak_sections: list[str] = []
     competitor_insights = ""
+    web_search_context = ""
 
     if serp_analysis and not isinstance(serp_analysis, BaseException):
         content_gaps = [g.topic for g in serp_analysis.content_gaps]
@@ -114,6 +118,15 @@ async def run_blog_generation(
         weak_sections = serp_analysis.weak_sections
         if word_count < serp_analysis.recommended_word_count:
             word_count = serp_analysis.recommended_word_count
+
+    # Include web search context if available
+    if web_search_data:
+        try:
+            from Backend.agents.web_search_agent import format_web_search_context
+        except ImportError:
+            from .web_search_agent import format_web_search_context
+        
+        web_search_context = format_web_search_context(web_search_data)
 
     # Analyze competitor URLs for tone/structure
     if competitor_urls:
@@ -138,6 +151,7 @@ async def run_blog_generation(
         title=title_override,
         missing_keywords=missing_keywords,
         competitor_insights=competitor_insights,
+        web_search_context=web_search_context,  # Include web search data
     )
 
     content = await chat_completion(system, user, temperature=0.75, max_tokens=8000)

@@ -17,6 +17,8 @@ class BlogGenerationRequest(BaseModel):
         default=[],
         description="[{'title': 'Blog Title', 'url': 'https://...', 'topic': 'topic'}]"
     )
+    enable_serp_analysis: bool = Field(default=True, description="Enable SERP analysis to include competitor insights")
+    enable_web_search: bool = Field(default=True, description="Enable web search to include latest information")
     enable_humanization: bool = Field(default=True)
     publish_to_hashnode: bool = Field(default=False, description="Publish to Hashnode after generation")
     hashnode_tags: list[str] = Field(default=[], description="Tags for Hashnode (max 5)", max_length=5)

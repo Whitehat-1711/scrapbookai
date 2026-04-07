@@ -225,6 +225,7 @@ def blog_generation_prompts(
     title: str | None = None,
     missing_keywords: list[str] = [],
     competitor_insights: str = "",
+    web_search_context: str = "",
     blog_type: str = "general",          # tutorial | listicle | comparison | explainer | opinion_editorial | news_analysis | case_study | roundup | general
     audience: str = "general readers",   # e.g. "startup founders", "beginner developers", "HR professionals"
     is_coding_topic: bool | None = None, # None = auto-detect from keyword
@@ -317,6 +318,9 @@ ADDITIONAL COMPETITOR WEAKNESSES TO EXPLOIT:
 
 MISSING KEYWORDS TO INCORPORATE (competitors under-covered these):
 {missing_kw_str}
+
+━━━ LATEST WEB INFORMATION ━━━
+{web_search_context if web_search_context else "(No web search data available)"}
 
 ━━━ COMPETITOR INSIGHTS ━━━
 {competitor_insights}

@@ -235,6 +235,7 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
     target_location: "India",
     word_count: 2500,
     tone: "professional",
+    enable_web_search: true,
     enable_humanization: true,
   });
 
@@ -281,6 +282,7 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
       target_location: form.target_location,
       word_count: Number(form.word_count) || 2500,
       tone: form.tone,
+      enable_web_search: form.enable_web_search,
       enable_humanization: form.enable_humanization,
       competitor_urls: form.competitor_urls
         ? form.competitor_urls
@@ -478,6 +480,22 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
                     <option value="conversational">Conversational</option>
                     <option value="authoritative">Authoritative</option>
                   </select>
+                </div>
+
+                <div className="panel-section">
+                  <label className="gen-checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={form.enable_web_search}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          enable_web_search: e.target.checked,
+                        }))
+                      }
+                    />
+                    Enable Web Search (Latest Info)
+                  </label>
                 </div>
 
                 <div className="panel-section">

@@ -1,6 +1,6 @@
 """
 POST /blog/generate — Full pipeline endpoint.
-Orchestrates: SERP → Keywords → Generate → SEO → Snippet → Humanize → Internal Links → Hashnode (optional)
+Orchestrates: Web Search → SERP → Keywords → Generate → SEO → Snippet → Humanize → Internal Links → Hashnode (optional)
 """
 
 import time
@@ -16,6 +16,7 @@ try:
     from Backend.models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult
     from Backend.agents.keyword_agent import run_keyword_clustering
     from Backend.agents.serp_agent import run_serp_analysis
+    from Backend.agents.web_search_agent import run_web_search, format_web_search_context
     from Backend.agents.blog_generator import run_blog_generation
     from Backend.agents.seo_optimizer import run_seo_analysis
     from Backend.agents.snippet_agent import run_snippet_optimization
@@ -32,6 +33,7 @@ except ImportError:
     from ..models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult
     from ..agents.keyword_agent import run_keyword_clustering
     from ..agents.serp_agent import run_serp_analysis
+    from ..agents.web_search_agent import run_web_search, format_web_search_context
     from ..agents.blog_generator import run_blog_generation
     from ..agents.seo_optimizer import run_seo_analysis
     from ..agents.snippet_agent import run_snippet_optimization
@@ -52,6 +54,7 @@ async def generate_blog(req: BlogGenerationRequest):
     Full blog generation pipeline. All agents run in optimized order.
 
     Pipeline:
+    0. Web Search              (Latest information from internet)
     1. Keyword Clustering      (Groq LLM)
     2. SERP Gap Analysis       (DuckDuckGo scrape + Groq LLM)
     3. Blog Generation         (Groq LLM — main content)
@@ -64,38 +67,48 @@ async def generate_blog(req: BlogGenerationRequest):
     start_time = time.time()
 
     try:
-        # ── Step 1+2 in parallel: Keyword Clustering + SERP Analysis ──────────
-        keyword_task = run_keyword_clustering(
-            seed_keyword=req.keyword,
-            target_location=req.target_location,
-            cluster_count=5,
-        )
-        serp_task = (
-            run_serp_analysis(
-                keyword=req.keyword,
-                target_location=req.target_location,
-                competitor_urls=req.competitor_urls,
-            )
-            if req.serp_analysis is None
-            else req.serp_analysis
-        )
-
-        if asyncio.iscoroutine(serp_task):
-            keyword_clusters, serp_analysis = await asyncio.gather(
-                keyword_task, serp_task, return_exceptions=True
-            )
-        else:
+        # ── Step 0: Web Search (Optional - Latest Information) ──────────────
+        web_search_data = None
+        if req.enable_web_search:
             try:
-                keyword_clusters = await keyword_task
-            except Exception as keyword_error:
-                keyword_clusters = keyword_error
-            serp_analysis = serp_task
+                print(f"🔍 Fetching latest web information for: {req.keyword}")
+                web_search_data = await run_web_search(
+                    keyword=req.keyword,
+                    max_results=8,
+                    extract_insights=True,
+                )
+                print(f"✓ Web search completed: {web_search_data['results_count']} sources found")
+            except Exception as e:
+                print(f"⚠️  Web search failed: {e}")
+                web_search_data = None
+        
+        # ── Step 1: Keyword Clustering (Groq LLM) ─────────────────────────────
+        keyword_clusters = None
+        if req.enable_serp_analysis:
+            try:
+                keyword_clusters = await run_keyword_clustering(
+                    seed_keyword=req.keyword,
+                    target_location=req.target_location,
+                    cluster_count=5,
+                )
+            except Exception as e:
+                print(f"⚠️  Keyword clustering failed: {e}")
+                keyword_clusters = None
 
-        # Graceful degradation if either fails
-        if isinstance(keyword_clusters, BaseException):
-            keyword_clusters = None
-        if isinstance(serp_analysis, BaseException):
-            serp_analysis = None
+        # ── Step 2: SERP Analysis (DuckDuckGo scrape + Groq LLM) ──────────────
+        serp_analysis = None
+        if req.enable_serp_analysis and req.serp_analysis is None:
+            try:
+                serp_analysis = await run_serp_analysis(
+                    keyword=req.keyword,
+                    target_location=req.target_location,
+                    competitor_urls=req.competitor_urls,
+                )
+            except Exception as e:
+                print(f"⚠️  SERP analysis failed: {e}")
+                serp_analysis = None
+        elif req.serp_analysis is not None:
+            serp_analysis = req.serp_analysis
 
         # ── Step 3: Blog Generation ────────────────────────────────────────────
         blog_data = await run_blog_generation(
@@ -109,6 +122,7 @@ async def generate_blog(req: BlogGenerationRequest):
             internal_links=req.internal_links,
             title_override=req.blog_title,
             competitor_urls=req.competitor_urls,
+            web_search_data=web_search_data,
         )
 
         content = blog_data["content"]
@@ -123,23 +137,28 @@ async def generate_blog(req: BlogGenerationRequest):
 
         ai_detection = AIDetectionResponse(**ai_detection_dict)
 
-        # ── Step 6+7+8 in parallel: SEO + Snippet + Internal Links ────────────
-        seo_task = run_seo_analysis(
+        # ── Step 6: SEO Analysis ──────────────────────────────────────────────
+        seo_score = await run_seo_analysis(
             content=content,
             title=title,
             keyword=req.keyword,
             secondary_keywords=req.secondary_keywords,
         )
-        snippet_task = run_snippet_optimization(content=content, keyword=req.keyword)
-        link_task = run_internal_linking(
-            content=content,
-            existing_blogs=req.internal_links,
-            primary_keyword=req.keyword,
+
+        # ── Step 7: Snippet Optimization ──────────────────────────────────────
+        snippet_optimization = await run_snippet_optimization(
+            content=content, keyword=req.keyword
         )
 
-        seo_score, snippet_optimization, internal_links = await asyncio.gather(
-            seo_task, snippet_task, link_task
-        )
+        # ── Step 8: Internal Linking ──────────────────────────────────────────
+        if req.internal_links:
+            internal_links = await run_internal_linking(
+                content=content,
+                existing_blogs=req.internal_links,
+                primary_keyword=req.keyword,
+            )
+        else:
+            internal_links = None
 
         elapsed = round(time.time() - start_time, 2)
 
