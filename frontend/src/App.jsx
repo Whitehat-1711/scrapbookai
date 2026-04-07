@@ -1,6 +1,5 @@
 import { useState } from "react";
 import BlogGenPage from "./BlogGenPage";
-import DashboardPage from "./DashboardPage";
 import HumanizePage from "./HumanizePage";
 import JournalPage from "./JournalPage";
 import SEOAuditPage from "./SEOAuditPage";
@@ -11,7 +10,6 @@ const pageRegistry = {
   journal: JournalPage,
   "blog-gen": BlogGenPage,
   "strategic-map": SerpPage,
-  "resource-pile": DashboardPage,
   humanizer: HumanizePage,
   "seo-audit": SEOAuditPage,
 };
@@ -66,7 +64,6 @@ function RouterShell() {
 
       // 🔥 auto navigate to blog page
       setCurrentPage("blog-gen");
-
     } catch (err) {
       console.error(err);
       alert("Error generating blog");
@@ -102,7 +99,6 @@ function RouterShell() {
       console.log("SERP DATA:", data);
 
       setSerpData(data);
-
     } catch (err) {
       console.error(err);
     } finally {
@@ -114,14 +110,12 @@ function RouterShell() {
     <ActivePage
       activePage={currentPage}
       onNavigate={setCurrentPage}
-
       // 🔥 SHARED STATE
       keyword={keyword}
       setKeyword={setKeyword}
       blogData={blogData}
       serpData={serpData}
       loading={loading}
-
       // 🔥 ACTIONS
       generateBlog={generateBlog}
       runSerpAnalysis={runSerpAnalysis}

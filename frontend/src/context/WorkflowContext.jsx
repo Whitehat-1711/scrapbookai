@@ -146,6 +146,23 @@ export function WorkflowProvider({ children }) {
     }
   };
 
+  const getTitleSuggestions = async (payload) => {
+    setLoadingFlag("titleSuggestions", true);
+    setErrorFlag("titleSuggestions", null);
+    try {
+      const result = await api.blog.titleSuggestions(payload);
+      return result?.titles || [];
+    } catch (error) {
+      setErrorFlag(
+        "titleSuggestions",
+        error.message || "Failed to generate title suggestions",
+      );
+      throw error;
+    } finally {
+      setLoadingFlag("titleSuggestions", false);
+    }
+  };
+
   const generateBlog = async (payload) => {
     setLoadingFlag("blogGeneration", true);
     setErrorFlag("blogGeneration", null);
@@ -264,6 +281,7 @@ export function WorkflowProvider({ children }) {
       actions: {
         runKeywordCluster,
         runSerpAnalysis,
+        getTitleSuggestions,
         generateBlog,
         runHumanize,
         runSEOAudit,

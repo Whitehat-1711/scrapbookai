@@ -164,3 +164,7 @@ class BlogGenerationResponse(BaseModel):
     model_config = {
         "protected_namespaces": ()
     }
+
+
+class TitleSuggestionsResponse(BaseModel):
+    titles: list[str] = Field(default_factory=list, description="SEO title suggestions")

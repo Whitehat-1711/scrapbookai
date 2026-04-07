@@ -64,3 +64,12 @@ class InternalLinkRequest(BaseModel):
 class HumanizationRequest(BaseModel):
     content: str = Field(..., min_length=100, description="Content to humanize")
     force: bool = Field(default=False, description="Force humanization even if AI score is low")
+
+
+class TitleSuggestionsRequest(BaseModel):
+    keyword: str = Field(..., min_length=2, description="Primary keyword for title ideas")
+    serp_analysis: Optional[SERPAnalysisResponse] = Field(
+        default=None,
+        description="Optional SERP intelligence to improve title strategy",
+    )
+    count: int = Field(default=6, ge=5, le=6, description="Number of title suggestions")

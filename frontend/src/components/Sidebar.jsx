@@ -5,7 +5,6 @@ const navItems = [
   { id: "journal", label: "Journal", icon: "📝" },
   { id: "blog-gen", label: "Blog Lab", icon: "✍️" },
   { id: "strategic-map", label: "SERP Lab", icon: "🔍" },
-  { id: "resource-pile", label: "Ops Dashboard", icon: "📊" },
   { id: "humanizer", label: "Humanizer", icon: "🧬" },
   { id: "seo-audit", label: "SEO Audit", icon: "🔬" },
 ];
@@ -165,7 +164,15 @@ export default function Sidebar({ activePage = "journal", onNavigate }) {
       <div className="sidebar">
         <div className="sidebar-logo">
           <div className="sidebar-avatar">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=aryan&backgroundColor=b6e3f4" style={{width:'100%',height:'100%'}} alt="avatar" onError={e => { e.target.style.display='none'; e.target.parentElement.innerHTML='🧑'; }} />
+            <img
+              src="https://api.dicebear.com/7.x/avataaars/svg?seed=aryan&backgroundColor=b6e3f4"
+              style={{ width: "100%", height: "100%" }}
+              alt="avatar"
+              onError={(e) => {
+                e.target.style.display = "none";
+                e.target.parentElement.innerHTML = "🧑";
+              }}
+            />
           </div>
           <div className="sidebar-logo-text">
             <h2>The Scrapbook</h2>
@@ -174,10 +181,10 @@ export default function Sidebar({ activePage = "journal", onNavigate }) {
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map(item => (
+          {navItems.map((item) => (
             <div
               key={item.id}
-              className={`nav-item ${activePage === item.id ? 'active' : ''}`}
+              className={`nav-item ${activePage === item.id ? "active" : ""}`}
               onClick={() => handleNavigate(item.id)}
             >
               <span className="nav-icon">{item.icon}</span>
@@ -187,22 +194,36 @@ export default function Sidebar({ activePage = "journal", onNavigate }) {
         </nav>
 
         <div className="sidebar-bottom">
-          <button className="new-entry-btn" onClick={() => handleNavigate("blog-gen")}>
+          <button
+            className="new-entry-btn"
+            onClick={() => handleNavigate("blog-gen")}
+          >
             <span>+</span> New Entry
           </button>
           <div className="sidebar-history">
             <div className="history-label">Recent Drafts</div>
             {recentHistory.length ? (
               recentHistory.map((entry, idx) => (
-                <div key={entry.id || idx} className="history-card" onClick={() => handleNavigate("blog-gen")}>
-                  <div className="history-title">{entry.title || entry.keyword}</div>
+                <div
+                  key={entry.id || idx}
+                  className="history-card"
+                  onClick={() => handleNavigate("blog-gen")}
+                >
+                  <div className="history-title">
+                    {entry.title || entry.keyword}
+                  </div>
                   <div className="history-meta">
-                    {entry.keyword || "--"} · {entry.seoScore ? `${Math.round(entry.seoScore)} SEO` : "Draft"}
+                    {entry.keyword || "--"} ·{" "}
+                    {entry.seoScore
+                      ? `${Math.round(entry.seoScore)} SEO`
+                      : "Draft"}
                   </div>
                 </div>
               ))
             ) : (
-              <div className="history-empty">No runs yet. Generate your first blog!</div>
+              <div className="history-empty">
+                No runs yet. Generate your first blog!
+              </div>
             )}
           </div>
         </div>

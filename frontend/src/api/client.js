@@ -55,6 +55,8 @@ export const api = {
   },
   blog: {
     generate: (payload, options = {}) => request("/blog/generate", { method: "POST", body: payload, ...options }),
+    titleSuggestions: (payload, options = {}) =>
+      request("/blog/title-suggestions", { method: "POST", body: payload, ...options }),
     list: ({ limit = 50, skip = 0, status } = {}, options = {}) => {
       const params = new URLSearchParams({ limit, skip });
       if (status) params.set("status", status);

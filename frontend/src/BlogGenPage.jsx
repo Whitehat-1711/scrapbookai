@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import Sidebar from "./components/Sidebar";
+import BlogGenerationLoader from "./components/BlogGenerationLoader";
 import { useWorkflow } from "./context/WorkflowContext";
 
 const genStyles = `
@@ -90,6 +91,46 @@ const genStyles = `
   .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 3px 3px 0px rgba(31,42,68,0.2); }
 
   .gen-error { color: #b3261e; font-size: 12px; font-weight: 700; margin-top: 6px; }
+
+  .title-ideas-btn {
+    width: 100%; padding: 10px 12px; border-radius: 10px;
+    border: 1.5px solid #1F2A44; background: #FDFAF6; color: #1F2A44;
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 800;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .title-ideas-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 2px 2px 0px rgba(31,42,68,0.16);
+    background: #FFF3CD;
+  }
+  .title-ideas-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .title-ideas-hint {
+    margin-top: 8px; font-size: 11px; color: rgba(31,42,68,0.55); font-weight: 700;
+  }
+  .title-ideas-loading {
+    margin-top: 6px; font-size: 11px; color: rgba(31,42,68,0.6); font-style: italic;
+  }
+
+  .title-ideas-list {
+    margin-top: 10px; display: flex; flex-direction: column; gap: 7px;
+  }
+  .title-idea-card {
+    border: 1.5px solid rgba(31,42,68,0.12); border-radius: 10px; padding: 8px 10px;
+    font-size: 12px; font-weight: 700; color: rgba(31,42,68,0.82); cursor: pointer;
+    background: rgba(253,250,246,0.9); transition: all 0.15s ease;
+  }
+  .title-idea-card:hover {
+    border-color: rgba(255,200,87,0.7); transform: translateY(-1px);
+  }
+  .title-idea-card.active {
+    border: 1.5px solid #1F2A44; background: rgba(255,200,87,0.25);
+    box-shadow: 2px 2px 0px rgba(31,42,68,0.15);
+  }
+
+  .title-edit-input {
+    margin-top: 10px;
+  }
 
   /* Center: Blog preview */
   .blog-preview-panel {
@@ -237,6 +278,9 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
     enable_web_search: false,
     enable_humanization: false,
   });
+  const [titleSuggestions, setTitleSuggestions] = useState([]);
+  const [selectedTitle, setSelectedTitle] = useState("");
+  const [titleInput, setTitleInput] = useState("");
 
   // Hashnode state
   const [hashnode, setHashnode] = useState({
@@ -291,9 +335,29 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
 
       // 🔥 This uses the current SERP analysis context if available
       serp_analysis: serpAnalysis || serpData || null,
+      blog_title: titleInput.trim() || undefined,
     });
     // Reset Hashnode state on new generation
     setHashnode({ tags: "", publishing: false, result: null, error: null });
+  };
+
+  const handleGenerateTitleIdeas = async () => {
+    if (!form.keyword.trim()) return;
+
+    try {
+      const titles = await actions.getTitleSuggestions({
+        keyword: form.keyword.trim(),
+        serp_analysis: serpAnalysis || serpData || null,
+      });
+
+      setTitleSuggestions(titles);
+      if (titles.length) {
+        setSelectedTitle(titles[0]);
+        setTitleInput(titles[0]);
+      }
+    } catch {
+      // errors surfaced via WorkflowContext errors.titleSuggestions
+    }
   };
 
   const handlePublishHashnode = async () => {
@@ -402,6 +466,61 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
                     }
                     placeholder="e.g. sustainable architecture"
                     required
+                  />
+                </div>
+
+                <div className="panel-section">
+                  <button
+                    type="button"
+                    className="title-ideas-btn"
+                    onClick={handleGenerateTitleIdeas}
+                    disabled={loading.titleSuggestions || !form.keyword.trim()}
+                  >
+                    {loading.titleSuggestions
+                      ? "🧠 Generating title ideas..."
+                      : "💡 Generate Title Ideas"}
+                  </button>
+                  <div className="title-ideas-hint">
+                    Choose a title or generate your own
+                  </div>
+                  {loading.titleSuggestions && (
+                    <div className="title-ideas-loading">
+                      Crafting high-CTR SEO options...
+                    </div>
+                  )}
+                  {errors.titleSuggestions && (
+                    <div className="gen-error">{errors.titleSuggestions}</div>
+                  )}
+
+                  {titleSuggestions.length > 0 && (
+                    <div className="title-ideas-list">
+                      {titleSuggestions.map((title, idx) => (
+                        <div
+                          key={`${title}-${idx}`}
+                          className={`title-idea-card ${selectedTitle === title ? "active" : ""}`}
+                          onClick={() => {
+                            setSelectedTitle(title);
+                            setTitleInput(title);
+                          }}
+                        >
+                          {selectedTitle === title ? "✓ " : ""}
+                          {title}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <input
+                    className="gen-input title-edit-input"
+                    value={titleInput}
+                    onChange={(e) => {
+                      const nextTitle = e.target.value;
+                      setTitleInput(nextTitle);
+                      setSelectedTitle(
+                        titleSuggestions.includes(nextTitle) ? nextTitle : "",
+                      );
+                    }}
+                    placeholder="Optional: edit selected title or write your own"
                   />
                 </div>
 
@@ -518,7 +637,11 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
 
             {/* Center Panel — Blog Preview */}
             <div className="blog-preview-panel">
-              {blogResult?.content ? (
+              {loading.blogGeneration ? (
+                <div className="blog-preview-card">
+                  <BlogGenerationLoader />
+                </div>
+              ) : blogResult?.content ? (
                 <div className="blog-preview-card">
                   {seo && (
                     <div className="blog-score-badge">
@@ -563,7 +686,8 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
                     <div>
                       🔗{" "}
                       <span>
-                        {blogResult.external_links_used || 0} external blogs used
+                        {blogResult.external_links_used || 0} external blogs
+                        used
                       </span>
                     </div>
                   </div>
@@ -664,14 +788,11 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
                   <div className="blog-placeholder">
                     <div className="blog-placeholder-icon">✍️</div>
                     <div className="blog-placeholder-text">
-                      {loading.blogGeneration
-                        ? "Generating your blog..."
-                        : "No blog generated yet"}
+                      No blog generated yet
                     </div>
                     <div className="blog-placeholder-sub">
-                      {loading.blogGeneration
-                        ? "Running keyword clustering, SERP analysis, content generation, SEO optimization, and humanization pipeline..."
-                        : "Fill in the keyword config on the left and hit Generate Blog to start the AI pipeline."}
+                      Fill in the keyword config on the left and hit Generate
+                      Blog to start the AI pipeline.
                     </div>
                   </div>
                 </div>

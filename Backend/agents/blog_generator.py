@@ -6,6 +6,7 @@ and keyword cluster data.
 """
 
 import re
+from typing import Any
 from slugify import slugify
 
 # Handle imports with fallback for different module contexts
@@ -229,3 +230,102 @@ async def run_blog_generation(
         "content": content,
         "word_count": actual_word_count,
     }
+
+
+async def run_title_suggestions(
+    keyword: str,
+    serp_analysis: Any | None = None,
+    count: int = 6,
+) -> list[str]:
+    """Generate 5-6 SEO title suggestions with diverse formats."""
+    safe_count = 6 if count > 6 else 5 if count < 5 else count
+    clean_keyword = keyword.strip()
+
+    winning_angle = "Practical, SEO-focused guidance that beats existing content"
+    serp_personality = "long-form guide"
+    recommended_format = "guide"
+    gap_topics: list[str] = []
+
+    if serp_analysis:
+        try:
+            if hasattr(serp_analysis, "winning_angle"):
+                winning_angle = getattr(serp_analysis, "winning_angle") or winning_angle
+                serp_personality = getattr(serp_analysis, "serp_personality", serp_personality)
+                recommended_format = getattr(serp_analysis, "recommended_format", recommended_format)
+                raw_gaps = getattr(serp_analysis, "content_gaps", []) or []
+                gap_topics = [getattr(g, "topic", "") for g in raw_gaps if getattr(g, "topic", "")]
+            elif isinstance(serp_analysis, dict):
+                winning_angle = serp_analysis.get("winning_angle") or winning_angle
+                serp_personality = serp_analysis.get("serp_personality") or serp_personality
+                recommended_format = serp_analysis.get("recommended_format") or recommended_format
+                raw_gaps = serp_analysis.get("content_gaps") or []
+                gap_topics = [g.get("topic", "") for g in raw_gaps if isinstance(g, dict) and g.get("topic")]
+        except Exception:
+            pass
+
+    gaps_text = ", ".join(gap_topics[:4]) if gap_topics else "None provided"
+
+    system = """You are a senior SEO strategist and CTR copywriter.
+Create high-converting blog titles for ranking and clicks.
+Return only valid JSON."""
+
+    user = f"""Generate exactly {safe_count} blog title suggestions for keyword: \"{clean_keyword}\".
+
+Context:
+- SERP personality: {serp_personality}
+- Recommended format: {recommended_format}
+- Winning angle: {winning_angle}
+- Content gaps: {gaps_text}
+
+Rules:
+- Every title must contain the exact keyword phrase \"{clean_keyword}\".
+- Keep titles engaging and SEO-friendly (ideally 50-70 chars, allow slight variation).
+- Ensure diverse formats across the set:
+  1) listicle
+  2) ultimate guide
+  3) question-based
+  4) comparison or vs format
+  5) actionable/how-to variant
+  6) trend/future-focused variant
+- Avoid repetitive phrasing and generic clickbait.
+
+Return JSON only in this schema:
+{{
+  \"titles\": [\"...\", \"...\"]
+}}"""
+
+    fallback_titles = [
+        f"10 Proven {clean_keyword} Strategies for Faster Growth",
+        f"The Ultimate Guide to {clean_keyword} in 2026",
+        f"What Is the Best {clean_keyword} Approach for Your Business?",
+        f"{clean_keyword} vs Traditional SEO: What Actually Works?",
+        f"How to Build a Winning {clean_keyword} Plan Step by Step",
+        f"{clean_keyword} Trends to Watch: What Changes Next",
+    ]
+
+    try:
+        llm_data = await chat_completion_json(system, user, temperature=0.6, max_tokens=1200)
+        raw_titles = llm_data.get("titles", []) if isinstance(llm_data, dict) else []
+
+        normalized: list[str] = []
+        seen: set[str] = set()
+        for item in raw_titles:
+            if not isinstance(item, str):
+                continue
+            title = item.strip().strip('"').strip()
+            if not title:
+                continue
+            if clean_keyword.lower() not in title.lower():
+                title = f"{title}: {clean_keyword}"
+            key = title.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            normalized.append(title)
+
+        if len(normalized) >= 5:
+            return normalized[:safe_count]
+    except Exception as e:
+        print(f"⚠️  Title suggestion generation failed: {e}")
+
+    return fallback_titles[:safe_count]

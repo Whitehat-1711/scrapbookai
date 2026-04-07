@@ -12,12 +12,12 @@ from bson import ObjectId
 # Handle imports with fallback for different module contexts
 try:
     # When run as: uvicorn Backend.core.main:app
-    from Backend.models.request_models import BlogGenerationRequest
-    from Backend.models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult
+    from Backend.models.request_models import BlogGenerationRequest, TitleSuggestionsRequest
+    from Backend.models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult, TitleSuggestionsResponse
     from Backend.agents.keyword_agent import run_keyword_clustering
     from Backend.agents.serp_agent import run_serp_analysis
     from Backend.agents.web_search_agent import run_web_search, format_web_search_context
-    from Backend.agents.blog_generator import run_blog_generation
+    from Backend.agents.blog_generator import run_blog_generation, run_title_suggestions
     from Backend.agents.seo_optimizer import run_seo_analysis
     from Backend.agents.snippet_agent import run_snippet_optimization
     from Backend.agents.humanizer import run_humanization
@@ -29,12 +29,12 @@ try:
     from Backend.models.models import BlogDocument
 except ImportError:
     # Fallback for relative imports
-    from ..models.request_models import BlogGenerationRequest
-    from ..models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult
+    from ..models.request_models import BlogGenerationRequest, TitleSuggestionsRequest
+    from ..models.response_models import BlogGenerationResponse, AIDetectionResponse, HashNodePublishResult, TitleSuggestionsResponse
     from ..agents.keyword_agent import run_keyword_clustering
     from ..agents.serp_agent import run_serp_analysis
     from ..agents.web_search_agent import run_web_search, format_web_search_context
-    from ..agents.blog_generator import run_blog_generation
+    from ..agents.blog_generator import run_blog_generation, run_title_suggestions
     from ..agents.seo_optimizer import run_seo_analysis
     from ..agents.snippet_agent import run_snippet_optimization
     from ..agents.humanizer import run_humanization
@@ -46,6 +46,20 @@ except ImportError:
     from ..models.models import BlogDocument
 
 router = APIRouter(prefix="/blog", tags=["Blog Generation"])
+
+
+@router.post("/title-suggestions", response_model=TitleSuggestionsResponse)
+async def get_title_suggestions(req: TitleSuggestionsRequest):
+    """Generate 5-6 title ideas before full blog generation."""
+    try:
+        titles = await run_title_suggestions(
+            keyword=req.keyword,
+            serp_analysis=req.serp_analysis,
+            count=req.count,
+        )
+        return TitleSuggestionsResponse(titles=titles)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Title suggestion generation failed: {str(e)}")
 
 
 @router.post("/generate", response_model=BlogGenerationResponse)
