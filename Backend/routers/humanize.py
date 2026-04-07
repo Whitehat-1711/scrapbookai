@@ -4,6 +4,7 @@ Rewrites AI-generated content to reduce AI detection.
 """
 
 from fastapi import APIRouter, HTTPException
+import re
 
 # Handle imports with fallback for different module contexts
 try:
@@ -16,6 +17,10 @@ except ImportError:
     from ..agents.humanizer import run_humanization
 
 router = APIRouter(prefix="", tags=["Humanization"])
+
+
+def _word_count(text: str) -> int:
+    return len(re.findall(r"\b\w+\b", text or ""))
 
 
 @router.post("/humanize")
@@ -48,6 +53,16 @@ async def humanize_content(req: HumanizationRequest):
         before_naturalness = ai_detection_before.get("naturalness_score", 0) if isinstance(ai_detection_before, dict) else 0
         after_naturalness = ai_detection_after.get("naturalness_score", 0) if isinstance(ai_detection_after, dict) else 0
         naturalness_improvement = after_naturalness - before_naturalness
+        ai_probability_delta = (
+            (ai_detection_before.get("ai_probability_percent", 0) if isinstance(ai_detection_before, dict) else 0)
+            - (ai_detection_after.get("ai_probability_percent", 0) if isinstance(ai_detection_after, dict) else 0)
+        )
+        before_flags = ai_detection_before.get("flags", []) if isinstance(ai_detection_before, dict) else []
+        after_flags = ai_detection_after.get("flags", []) if isinstance(ai_detection_after, dict) else []
+        flags_removed_count = max(0, len(before_flags) - len(after_flags))
+        input_words = _word_count(req.content)
+        output_words = _word_count(humanized_content)
+        word_count_delta = output_words - input_words
 
         return {
             "humanized_content": humanized_content,
@@ -55,6 +70,11 @@ async def humanize_content(req: HumanizationRequest):
             "after_detection": ai_detection_after,
             "was_humanized": was_humanized,
             "naturalness_improvement": naturalness_improvement,
+            "ai_probability_delta": ai_probability_delta,
+            "flags_removed_count": flags_removed_count,
+            "input_word_count": input_words,
+            "output_word_count": output_words,
+            "word_count_delta": word_count_delta,
         }
 
     except Exception as e:

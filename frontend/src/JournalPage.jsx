@@ -78,8 +78,12 @@ const journalStyles = `
   .blog-meta span { font-weight: 700; }
   .seo-badge { padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 800; background: #C8E6CB; color: #1F5732; border: 1.5px solid #2D6A4F; white-space: nowrap; }
   .seo-badge.orange { background: #FFE5A0; color: #7A5400; border-color: #E6B040; }
-  .del-btn { font-size: 16px; opacity: 0.7; cursor: pointer; transition: opacity 0.15s; padding: 4px; border-radius: 6px; }
-  .del-btn:hover { opacity: 1; background: rgba(200,60,60,0.08); }
+  .del-btn {
+    font-size: 16px; opacity: 0.95; cursor: pointer; transition: all 0.15s;
+    padding: 4px 7px; border-radius: 7px; background: rgba(220, 53, 69, 0.18);
+    border: 1px solid rgba(220, 53, 69, 0.45);
+  }
+  .del-btn:hover { opacity: 1; background: rgba(220, 53, 69, 0.28); transform: translateY(-1px); }
 
   /* Stats card */
   .seo-health-card { background: #FDFAF6; border: 2px dashed rgba(31,42,68,0.2); border-radius: 18px; padding: 20px; box-shadow: 3px 3px 0px rgba(31,42,68,0.07); }

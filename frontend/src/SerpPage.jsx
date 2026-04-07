@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
-import ProfileOverlay from "./components/ProfileOverlay";
 import { useWorkflow } from "./context/WorkflowContext";
 
 const serpStyles = `
@@ -17,27 +16,16 @@ const serpStyles = `
   }
 
   .topbar {
-    display: flex; align-items: center; gap: 14px; padding: 12px 24px;
+    display: flex; align-items: center; gap: 12px; padding: 12px 24px;
     background: rgba(245,235,221,0.92); backdrop-filter: blur(4px);
     border-bottom: 1.5px dashed rgba(31,42,68,0.12); position: sticky; top: 0; z-index: 100;
   }
   .topbar-search {
-    flex: 1; max-width: 300px; display: flex; align-items: center; gap: 8px;
+    flex: 1; max-width: 560px; display: flex; align-items: center; gap: 8px;
     background: #FDFAF6; border: 1.5px solid rgba(31,42,68,0.15); border-radius: 50px; padding: 7px 14px;
   }
   .topbar-search input { border: none; background: transparent; outline: none; font-family: 'Nunito', sans-serif; font-size: 13px; color: #1F2A44; width: 100%; }
   .topbar-search input::placeholder { color: #9AA5B4; }
-  .badge { padding: 5px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; border: 1.5px solid; }
-  .badge-geo { background: #C8E6CB; color: #2D6A4F; border-color: #2D6A4F; }
-  .badge-seo { background: #D4C8F5; color: #4A3B8C; border-color: #4A3B8C; }
-  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; position: relative; }
-  .topbar-greeting { 
-    background: #C8E6CB; border: 1.5px solid #2D6A4F;
-    border-radius: 50px; padding: 6px 14px;
-    font-weight: 700; font-size: 13px; color: #1F2A44;
-  }
-  .topbar-bell { font-size: 18px; cursor: pointer; }
-  .topbar-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #1F2A44; overflow: hidden; cursor: pointer; }
 
   .page-body { padding: 32px 28px 80px; }
 
@@ -59,11 +47,11 @@ const serpStyles = `
 
   /* Main grid */
   .main-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 32px; align-items: start;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 28px; align-items: start;
   }
 
   /* Left: Competitor landscape */
-  .comp-section {}
+  .comp-section { align-self: start; }
   .comp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .comp-title { font-weight: 900; font-size: 22px; color: #1F2A44; }
   .sources-badge {
@@ -72,26 +60,12 @@ const serpStyles = `
     display: flex; align-items: center; gap: 6px;
   }
 
-  .center-diagram {
-    display: flex; justify-content: center; align-items: center;
-    margin: 8px 0 20px; position: relative; height: 70px;
-  }
-  .opportunity-circle {
-    width: 90px; height: 90px; border-radius: 50%;
-    border: 2px dashed rgba(31,42,68,0.25);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-family: 'Caveat', cursive; font-size: 11px; font-weight: 700;
-    color: rgba(31,42,68,0.6); text-align: center; position: absolute; left: 50%; top: -10px;
-    transform: translateX(-50%); background: rgba(245,235,221,0.8);
-  }
-  .opp-arrow { font-size: 22px; position: absolute; right: 20%; top: 50%; transform: translateY(-50%) rotate(-30deg); opacity: 0.4; }
-
   .comp-list { display: flex; flex-direction: column; gap: 14px; }
   .comp-card {
     background: #FDFAF6; border: 1.5px solid rgba(31,42,68,0.1);
     border-radius: 16px; padding: 16px 18px; cursor: pointer;
     box-shadow: 3px 3px 0px rgba(31,42,68,0.06); transition: all 0.2s;
-    position: relative; overflow: hidden;
+    position: relative; overflow: hidden; min-height: 96px;
   }
   .comp-card:hover { transform: translateY(-2px) translateX(-1px); box-shadow: 5px 5px 0px rgba(31,42,68,0.1); }
   .comp-card::before {
@@ -127,7 +101,7 @@ const serpStyles = `
   }
 
   /* Right: Gap Opportunities */
-  .gap-section {}
+  .gap-section { align-self: start; }
   .gap-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .gap-title { font-weight: 900; font-size: 22px; color: #1F2A44; }
   .reanalyze-btn {
@@ -159,7 +133,8 @@ const serpStyles = `
   }
   .priority-dot { width: 8px; height: 8px; background: #2D6A4F; border-radius: 50%; }
 
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; }
+  .two-col .gap-card { min-height: 158px; }
 
   .gap-card-title { font-weight: 900; font-size: 18px; color: #1F2A44; margin-bottom: 6px; }
   .gap-card-body { font-size: 13px; color: rgba(31,42,68,0.75); line-height: 1.5; }
@@ -211,7 +186,6 @@ const serpStyles = `
 `;
 
 export default function SerpPage({ activePage = "strategic-map", onNavigate }) {
-  const [showProfile, setShowProfile] = useState(false);
   const { serpData, loading, errors, actions, blogResult } = useWorkflow();
   const [searchKeyword, setSearchKeyword] = useState(blogResult?.keyword || "");
   const [competitorUrls, setCompetitorUrls] = useState([]);
@@ -221,9 +195,14 @@ export default function SerpPage({ activePage = "strategic-map", onNavigate }) {
 
   const loadSerpAnalysis = async (kw = effectiveKeyword) => {
     setLocalError(null);
+    const safeKeyword = (kw || "").trim();
+    if (!safeKeyword) {
+      setLocalError("Enter a keyword to run SERP analysis.");
+      return null;
+    }
     try {
       return await actions.runSerpAnalysis({
-        keyword: kw,
+        keyword: safeKeyword,
         target_location: "India",
         competitor_urls: competitorUrls,
       });
@@ -249,7 +228,7 @@ export default function SerpPage({ activePage = "strategic-map", onNavigate }) {
   };
 
   useEffect(() => {
-    if (!serpData) {
+    if (!serpData && (searchKeyword || "").trim()) {
       loadSerpAnalysis(searchKeyword);
     }
   }, []);
@@ -309,21 +288,6 @@ export default function SerpPage({ activePage = "strategic-map", onNavigate }) {
                 placeholder="Search insights..."
               />
             </div>
-            <div className="topbar-search" style={{ maxWidth: "400px" }}>
-              <span>🔗</span>
-              <input
-                value={competitorUrls.join(", ")}
-                onChange={(e) =>
-                  setCompetitorUrls(
-                    e.target.value
-                      .split(",")
-                      .map((url) => url.trim())
-                      .filter((url) => url),
-                  )
-                }
-                placeholder="Add competitor blog URLs (optional, comma-separated)"
-              />
-            </div>
             <button
               className="reanalyze-btn"
               onClick={handleRunSerpAnalysis}
@@ -331,28 +295,6 @@ export default function SerpPage({ activePage = "strategic-map", onNavigate }) {
             >
               {isAnalyzing ? "Analyzing..." : "🔄 Re-analyze"}
             </button>
-            <span className="badge badge-geo">GEO READY</span>
-            <span className="badge badge-seo">SEO ENGINE ON</span>
-            <div className="topbar-right">
-              <div className="topbar-greeting">Good morning, Aryan 👊</div>
-              <div className="topbar-bell">🔔</div>
-              <div
-                className="topbar-avatar"
-                onClick={() => setShowProfile((v) => !v)}
-              >
-                <img
-                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=aryan&backgroundColor=b6e3f4"
-                  style={{ width: "100%", height: "100%" }}
-                  alt="av"
-                />
-              </div>
-              {showProfile && (
-                <ProfileOverlay
-                  onClose={() => setShowProfile(false)}
-                  onNavigate={onNavigate}
-                />
-              )}
-            </div>
           </div>
 
           <div className="page-body">
@@ -361,7 +303,7 @@ export default function SerpPage({ activePage = "strategic-map", onNavigate }) {
               <h1 className="page-title">SERP Gap Analysis</h1>
               <p className="page-desc">
                 We've dissected the top 5 competitors for{" "}
-                <span className="highlight">"{effectiveKeyword}"</span>. Here's
+                <span className="highlight">"{effectiveKeyword || "your topic"}"</span>. Here's
                 where they're winning, and where you can strike.
                 {serpData && (
                   <>
@@ -398,15 +340,6 @@ export default function SerpPage({ activePage = "strategic-map", onNavigate }) {
                   <div className="sources-badge">
                     {serpData?.results?.length || 0} SERP sources analyzed
                   </div>
-                </div>
-
-                <div className="center-diagram">
-                  <div className="opportunity-circle">
-                    YOUR CONTENT
-                    <br />
-                    OPPORTUNITY
-                  </div>
-                  <div className="opp-arrow">↗</div>
                 </div>
 
                 <div className="comp-list">

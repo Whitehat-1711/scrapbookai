@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import Sidebar from "./components/Sidebar";
 import { useWorkflow } from "./context/WorkflowContext";
 
@@ -33,8 +34,35 @@ const profileStyles = `
 `;
 
 export default function ProfilePage({ activePage = "profile", onNavigate }) {
-  const { blogHistory } = useWorkflow();
-  const recent = blogHistory.slice(0, 5);
+  const { blogHistory, mongoBlogs, actions } = useWorkflow();
+
+  useEffect(() => {
+    if (!mongoBlogs.length) {
+      actions
+        .fetchBlogHistory({ limit: 25 })
+        .catch(() => {});
+    }
+  }, [actions, mongoBlogs.length]);
+
+  const unifiedHistory = useMemo(() => {
+    if (Array.isArray(blogHistory) && blogHistory.length) return blogHistory;
+    if (!Array.isArray(mongoBlogs) || !mongoBlogs.length) return [];
+    return mongoBlogs.map((b) => ({
+      id: b.id,
+      title: b.title || "Untitled Blog",
+      keyword: b.keyword || "",
+      seoScore: Number(b.seo_score || 0),
+      wordCount: Number(b.word_count || 0),
+      createdAt: b.created_at || new Date().toISOString(),
+    }));
+  }, [blogHistory, mongoBlogs]);
+
+  const recent = unifiedHistory.slice(0, 5);
+  const avgSeo = useMemo(() => {
+    const scored = recent.filter((r) => Number.isFinite(Number(r.seoScore)));
+    if (!scored.length) return 0;
+    return Math.round(scored.reduce((s, r) => s + Number(r.seoScore || 0), 0) / scored.length);
+  }, [recent]);
 
   return (
     <>
@@ -71,11 +99,11 @@ export default function ProfilePage({ activePage = "profile", onNavigate }) {
               <div className="stats">
                 <div className="stat">
                   <div className="stat-label">Blogs Generated</div>
-                  <div className="stat-value">{blogHistory.length}</div>
+                  <div className="stat-value">{unifiedHistory.length}</div>
                 </div>
                 <div className="stat">
                   <div className="stat-label">Avg. SEO Score</div>
-                  <div className="stat-value">{Math.round((recent.reduce((s, r) => s + (r.seoScore || 0), 0) / (recent.length || 1)) || 0)}</div>
+                  <div className="stat-value">{avgSeo}</div>
                 </div>
                 <div className="stat">
                   <div className="stat-label">Recent Wordcount</div>

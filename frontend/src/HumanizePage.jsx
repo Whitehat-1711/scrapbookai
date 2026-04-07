@@ -150,7 +150,7 @@ const formatNumber = (value) => (typeof value === "number" ? value.toFixed(1) : 
 export default function HumanizePage({ activePage = "humanizer", onNavigate }) {
   const { blogResult, humanizeResult, loading, errors, actions } = useWorkflow();
   const [content, setContent] = useState(blogResult?.content || "");
-  const [forceRewrite, setForceRewrite] = useState(false);
+  const [forceRewrite, setForceRewrite] = useState(true);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -267,6 +267,33 @@ export default function HumanizePage({ activePage = "humanizer", onNavigate }) {
                         {humanizeResult && improvement !== null ? `${improvement.toFixed(1)} pts` : "--"}
                       </div>
                       <div className="score-sub">Naturalness gain</div>
+                    </div>
+                    <div className="score-card">
+                      <div className="score-label">AI Delta</div>
+                      <div className="score-value">
+                        {typeof humanizeResult?.ai_probability_delta === "number"
+                          ? `${humanizeResult.ai_probability_delta.toFixed(1)} pts`
+                          : "--"}
+                      </div>
+                      <div className="score-sub">AI probability reduction</div>
+                    </div>
+                    <div className="score-card">
+                      <div className="score-label">Flags Removed</div>
+                      <div className="score-value">
+                        {typeof humanizeResult?.flags_removed_count === "number"
+                          ? humanizeResult.flags_removed_count
+                          : "--"}
+                      </div>
+                      <div className="score-sub">Cliche/pattern cleanup</div>
+                    </div>
+                    <div className="score-card">
+                      <div className="score-label">Rewrite Status</div>
+                      <div className="score-value">{humanizeResult?.was_humanized ? "YES" : "NO"}</div>
+                      <div className="score-sub">
+                        {typeof humanizeResult?.word_count_delta === "number"
+                          ? `Word delta: ${humanizeResult.word_count_delta >= 0 ? "+" : ""}${humanizeResult.word_count_delta}`
+                          : "No word delta"}
+                      </div>
                     </div>
                   </div>
 

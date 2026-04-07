@@ -380,6 +380,8 @@ EDITING PRINCIPLES:
 - Insert rhetorical questions, mild opinions, and first-person observations where natural
 - Break up long uniform paragraphs — 2–4 sentences max per paragraph is often better
 - Remove ALL AI clichés (see banned list below)
+- Rewrite any robotic transitions into natural spoken phrasing
+- Keep semantic meaning identical, but rewrite sentence construction aggressively where needed
 
 BANNED PHRASES — delete or rewrite on sight:
 "In conclusion" | "It is worth noting" | "Delve into" | "In today's world" |
@@ -409,6 +411,12 @@ PRIMARY KEYWORD (preserve placements): {keyword if keyword else "see original"}
 
 ORIGINAL BLOG:
 {content}
+
+Execution requirements:
+1) First, silently identify AI-like lines (uniform sentence rhythm, template transitions, generic filler).
+2) Then rewrite those lines with concrete, human phrasing and varied cadence.
+3) Prefer active voice and specific verbs.
+4) Do not return analysis. Return only final rewritten markdown.
 
 Rewrite the COMPLETE blog now — every section, preserving all structure and SEO elements:"""
 

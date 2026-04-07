@@ -452,7 +452,7 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
             {/* Left Panel — Form */}
             <div className="kw-panel">
               <div className="kw-panel-title">
-                🏷 Blog Config {serpData ? "✨ (SERP Enhanced)" : ""}
+                ⚙️ Blog Config 
               </div>
 
               <form onSubmit={handleGenerate}>
@@ -778,6 +778,7 @@ export default function BlogGenPage({ activePage = "blog-gen", onNavigate }) {
                         <strong>Top Gaps:</strong>{" "}
                         {(serpAnalysis || serpData).content_gaps
                           ?.slice(0, 4)
+                          .map(gap => gap.topic)
                           .join(", ") || "None detected"}
                       </div>
                     </div>

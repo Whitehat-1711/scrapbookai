@@ -90,6 +90,14 @@ def _serialize_list_item(doc: dict) -> dict:
     if item.get("updated_at") and not isinstance(item["updated_at"], datetime):
         item["updated_at"] = None
 
+    # Flatten metadata payload for list/detail response convenience.
+    metadata = item.get("metadata") or {}
+    if isinstance(metadata, dict):
+        item["meta_description"] = metadata.get("meta_description") or item.get("meta_description")
+        item["slug"] = metadata.get("slug") or item.get("slug")
+        item["ai_detection_score"] = metadata.get("ai_detection_score", item.get("ai_detection_score"))
+        item["generation_time"] = metadata.get("generation_time", item.get("generation_time"))
+
     return item
 
 

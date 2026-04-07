@@ -58,6 +58,10 @@ class BlogResponse(BaseModel):
     word_count: int
     created_at: Optional[datetime] = None
     status: str = "published"
+    generation_time: Optional[float] = None
+    meta_description: Optional[str] = None
+    slug: Optional[str] = None
+    ai_detection_score: Optional[float] = None
 
 
 class BlogListResponse(BaseModel):
@@ -71,6 +75,8 @@ class BlogListResponse(BaseModel):
     status: str = "published"
     meta_description: Optional[str] = None
     slug: Optional[str] = None
+    generation_time: Optional[float] = None
+    ai_detection_score: Optional[float] = None
 
 
 class UserDocument(BaseModel):
