@@ -21,8 +21,18 @@ from fastapi.responses import JSONResponse
 from .config import APP_HOST, APP_PORT, CORS_ORIGINS, GROQ_MODEL, APP_ENV
 from .database import connect_to_mongo, disconnect_from_mongo
 
-# Import routers - use fully qualified Backend paths for uvicorn
+# Import routers - support both Render rootDir=Backend and repo-root runs.
 try:
+    # Render path (rootDir=Backend): modules are top-level packages.
+    from routers.blog import router as blog_router
+    from routers.blog_management import router as blog_management_router
+    from routers.keywords import router as keywords_router
+    from routers.serp import router as serp_router
+    from routers.seo import router as seo_router
+    from routers.humanize import router as humanize_router
+    from routers.auth import router as auth_router
+except ImportError:
+    # Repo-root path: Backend is the package root.
     from Backend.routers.blog import router as blog_router
     from Backend.routers.blog_management import router as blog_management_router
     from Backend.routers.keywords import router as keywords_router
@@ -30,15 +40,6 @@ try:
     from Backend.routers.seo import router as seo_router
     from Backend.routers.humanize import router as humanize_router
     from Backend.routers.auth import router as auth_router
-except ImportError:
-    # Fallback for other import contexts
-    from ..routers.blog import router as blog_router
-    from ..routers.blog_management import router as blog_management_router
-    from ..routers.keywords import router as keywords_router
-    from ..routers.serp import router as serp_router
-    from ..routers.seo import router as seo_router
-    from ..routers.humanize import router as humanize_router
-    from ..routers.auth import router as auth_router
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -172,7 +173,7 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
-        "main:app",
+        "core.main:app",
         host=APP_HOST,
         port=APP_PORT,
         reload=(APP_ENV == "development"),
