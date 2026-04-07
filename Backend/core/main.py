@@ -18,7 +18,14 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from .config import APP_HOST, APP_PORT, CORS_ORIGINS, GROQ_MODEL, APP_ENV
+from .config import (
+    APP_HOST,
+    APP_PORT,
+    CORS_ORIGINS,
+    CORS_ALLOW_ORIGIN_REGEX,
+    GROQ_MODEL,
+    APP_ENV,
+)
 from .database import connect_to_mongo, disconnect_from_mongo
 
 # Import routers - choose import style by module package context.
@@ -113,6 +120,7 @@ Built with **Groq (llama-3.3-70b-versatile)** for blazing-fast generation.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
+    allow_origin_regex=CORS_ALLOW_ORIGIN_REGEX or None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

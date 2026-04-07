@@ -36,9 +36,12 @@ MONGODB_DB_NAME: str = "blogy"
 APP_ENV: str = os.getenv("APP_ENV", "development")
 APP_HOST: str = os.getenv("APP_HOST", "0.0.0.0")
 APP_PORT: int = int(os.getenv("APP_PORT", "8000"))
-CORS_ORIGINS: list[str] = os.getenv(
-    "CORS_ORIGINS", "http://localhost:3000,http://localhost:5173"
-).split(",")
+_cors_raw = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173")
+CORS_ORIGINS: list[str] = [origin.strip() for origin in _cors_raw.split(",") if origin.strip()]
+CORS_ALLOW_ORIGIN_REGEX: str = os.getenv(
+    "CORS_ALLOW_ORIGIN_REGEX",
+    r"https://.*\.vercel\.app",
+).strip()
 
 # ── SEO thresholds ────────────────────────────────────────────────────────────
 KEYWORD_DENSITY_MIN: float = 0.5   # %
