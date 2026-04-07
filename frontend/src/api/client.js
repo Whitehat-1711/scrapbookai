@@ -13,6 +13,18 @@ const defaultHeaders = {
   "Content-Type": "application/json",
 };
 
+const extractErrorMessage = (payload, fallback) => {
+  if (!payload) return fallback;
+  if (typeof payload.detail === "string") return payload.detail;
+  if (Array.isArray(payload.detail) && payload.detail.length > 0) {
+    const first = payload.detail[0];
+    if (typeof first === "string") return first;
+    if (first?.msg) return first.msg;
+  }
+  if (payload.error) return payload.error;
+  return fallback;
+};
+
 async function request(path, { method = "GET", body, headers, signal } = {}) {
   const response = await fetch(buildUrl(path), {
     method,
@@ -32,7 +44,7 @@ async function request(path, { method = "GET", body, headers, signal } = {}) {
   }
 
   if (!response.ok) {
-    const message = payload?.detail || payload?.error || response.statusText || "Request failed";
+    const message = extractErrorMessage(payload, response.statusText || "Request failed");
     const reqError = new Error(message);
     reqError.status = response.status;
     reqError.payload = payload;

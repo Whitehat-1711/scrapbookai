@@ -95,3 +95,47 @@ Then redeploy backend (or trigger restart).
 If you attach custom domains:
 - Update `CORS_ORIGINS` with the custom frontend domain.
 - Keep local dev origin if needed.
+
+---
+
+## 🔧 Troubleshooting
+
+### Issue: 422 Error on Signup/Login from Vercel
+
+**Cause:** Frontend missing `VITE_API_URL` environment variable, defaulting to `http://localhost:8000`.
+
+**Fix:**
+1. Go to Vercel dashboard → Your project
+2. Settings → Environment Variables
+3. Ensure `VITE_API_URL` is set to your Render backend URL:
+   ```
+   VITE_API_URL=https://blogy-api-q1q9.onrender.com
+   ```
+   *(Replace with your actual Render URL)*
+4. **Redeploy** the frontend (Deployments → Redeploy)
+5. Test signup again
+
+**To Verify:**
+- Open browser DevTools → Network tab
+- Check signup request URL
+- It should go to `https://blogy-api-xxx.onrender.com/auth/signup`
+- NOT `http://localhost:8000/auth/signup`
+
+---
+
+### Issue: CORS Error after fixing API URL
+
+**Cause:** Backend's `CORS_ORIGINS` doesn't include your Vercel frontend URL.
+
+**Fix (Render Dashboard):**
+1. Go to your `blogy-api` service
+2. Environment → Edit `CORS_ORIGINS`
+3. Add your Vercel URL:
+   ```
+   CORS_ORIGINS=https://your-app.vercel.app,http://localhost:5173
+   ```
+4. **Redeploy** the backend
+5. Wait 2-3 minutes, then test again
+
+**CORS Regex** (already configured):
+- `CORS_ALLOW_ORIGIN_REGEX=https://.*\.vercel\.app` ✓

@@ -51,14 +51,32 @@ export default function LoginPage({ onNavigate }) {
     try {
       let res;
       if (mode === "signup") {
+        const cleanUsername = username.trim();
+        const cleanEmail = email.trim();
+        if (cleanUsername.length < 2) {
+          throw new Error("Username must be at least 2 characters.");
+        }
+        if (cleanEmail.length < 5 || !cleanEmail.includes("@")) {
+          throw new Error("Please enter a valid email address.");
+        }
+        if (password.length < 8) {
+          throw new Error("Password must be at least 8 characters.");
+        }
         res = await api.auth.signup({
-          username: username.trim(),
-          email: email.trim(),
+          username: cleanUsername,
+          email: cleanEmail,
           password,
         });
       } else {
+        const cleanEmail = email.trim();
+        if (cleanEmail.length < 5 || !cleanEmail.includes("@")) {
+          throw new Error("Please enter a valid email address.");
+        }
+        if (password.length < 8) {
+          throw new Error("Password must be at least 8 characters.");
+        }
         res = await api.auth.login({
-          email: email.trim(),
+          email: cleanEmail,
           password,
         });
       }
