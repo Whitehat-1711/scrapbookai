@@ -21,18 +21,12 @@ from fastapi.responses import JSONResponse
 from .config import APP_HOST, APP_PORT, CORS_ORIGINS, GROQ_MODEL, APP_ENV
 from .database import connect_to_mongo, disconnect_from_mongo
 
-# Import routers - support both Render rootDir=Backend and repo-root runs.
-try:
-    # Render path (rootDir=Backend): modules are top-level packages.
-    from routers.blog import router as blog_router
-    from routers.blog_management import router as blog_management_router
-    from routers.keywords import router as keywords_router
-    from routers.serp import router as serp_router
-    from routers.seo import router as seo_router
-    from routers.humanize import router as humanize_router
-    from routers.auth import router as auth_router
-except ImportError:
-    # Repo-root path: Backend is the package root.
+# Import routers - choose import style by module package context.
+# `core.main`   (Render rootDir=Backend) -> import from `routers.*`
+# `Backend.core.main` (repo root)        -> import from `Backend.routers.*`
+_ROOT_PACKAGE = (__package__ or "").split(".")[0]
+
+if _ROOT_PACKAGE == "Backend":
     from Backend.routers.blog import router as blog_router
     from Backend.routers.blog_management import router as blog_management_router
     from Backend.routers.keywords import router as keywords_router
@@ -40,6 +34,14 @@ except ImportError:
     from Backend.routers.seo import router as seo_router
     from Backend.routers.humanize import router as humanize_router
     from Backend.routers.auth import router as auth_router
+else:
+    from routers.blog import router as blog_router
+    from routers.blog_management import router as blog_management_router
+    from routers.keywords import router as keywords_router
+    from routers.serp import router as serp_router
+    from routers.seo import router as seo_router
+    from routers.humanize import router as humanize_router
+    from routers.auth import router as auth_router
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
