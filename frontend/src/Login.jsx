@@ -43,6 +43,16 @@ export default function LoginPage({ onNavigate }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const helperBoxStyle = {
+    marginTop: "4px",
+    padding: "8px 10px",
+    border: "1px dashed #1F2A44",
+    background: "#F8F4EC",
+    color: "#1F2A44",
+    fontSize: "0.82rem",
+    fontWeight: 700,
+    lineHeight: 1.35,
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -199,6 +209,7 @@ export default function LoginPage({ onNavigate }) {
                   color: "#1F2A44",
                 }}
               />
+              <div style={helperBoxStyle}>Username must be at least 2 characters.</div>
             </div>
           )}
 
@@ -225,6 +236,7 @@ export default function LoginPage({ onNavigate }) {
               onFocus={(e) => { e.target.style.boxShadow = '3px 3px 0px rgba(31,42,68,0.2)'; e.target.style.transform = 'translate(-2px, -2px)'; e.target.style.transition = 'all 0.1s'; }}
               onBlur={(e) => { e.target.style.boxShadow = 'none'; e.target.style.transform = 'none'; }}
             />
+            <div style={helperBoxStyle}>Email must be at least 5 characters and contain "@".</div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -250,6 +262,10 @@ export default function LoginPage({ onNavigate }) {
               onFocus={(e) => { e.target.style.boxShadow = '3px 3px 0px rgba(31,42,68,0.2)'; e.target.style.transform = 'translate(-2px, -2px)'; e.target.style.transition = 'all 0.1s'; }}
               onBlur={(e) => { e.target.style.boxShadow = 'none'; e.target.style.transform = 'none'; }}
             />
+            <div style={helperBoxStyle}>
+              Password must be at least 8 characters.
+              {mode === "signup" ? " (Required for signup)" : " (Required for login)"}
+            </div>
           </div>
 
           <button 
